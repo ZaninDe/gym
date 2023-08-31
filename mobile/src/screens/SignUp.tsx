@@ -12,6 +12,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from '@services/api'
 import axios from 'axios'
 import { Alert } from 'react-native'
+import { AppError } from '@utils/AppError'
 
 type FormDataProps = {
   name: string
@@ -59,12 +60,13 @@ export function SignUp() {
       const response = await  api.post('/users', { name, email, password })
       console.log(response.data)
     } catch (error) {
-      if(axios.isAxiosError(error))
-      toast.show({
-        title: 'Já existe um usuário com este e-mail',
-        placement: 'top',
-        bgColor: 'red.500',
-      })
+     const isAppError = error instanceof AppError
+     const title = isAppError ? error.message : 'Não foi possível criar a conta. Tente mais tarde.'
+     toast.show({
+      title,
+      placement: 'top',
+      bgColor: 'red.500'
+     })
     }
   }
   return (
